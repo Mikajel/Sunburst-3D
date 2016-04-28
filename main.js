@@ -10,7 +10,7 @@ Note:
 function init (tree) {
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth - 100, window.innerHeight - 100);
+    renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
 
     scene = new THREE.Scene();
@@ -95,23 +95,25 @@ Note:
     BaseHeight decreases with depth - deepest partitions are in height 0 and root is on a top.
 */
 function drawCylinderPartition(scene, maxDepth, totalNodes, depth, offset, size, color){
-    
-    var width = 100 + 50*depth;
-    var baseHeight = 40*(maxDepth - depth);
-    var height = 40;
 
-    //count angular start and end of partition on circle
-    var thetaStart = (offset/totalNodes)*(2*Math.PI);
-    var thetaLength   = ((size)/totalNodes)*(2*Math.PI);
+    if(depth < maxDepth) {
+        var width = 100 + 50 * depth;
+        var baseHeight = 40 * (maxDepth - depth);
+        var height = 40;
 
-    var geometry = new THREE.CylinderGeometry(width, width, height, 30, 5, false, thetaStart, thetaLength);
-    var material = new THREE.MeshBasicMaterial( {color: color, side: THREE.DoubleSide} );
-    var cylinder = new THREE.Mesh( geometry, material );
-    var cylinderEdges = new THREE.EdgesHelper( cylinder, 0x888888 );
+        //count angular start and end of partition on circle
+        var thetaStart = (offset / totalNodes) * (2 * Math.PI);
+        var thetaLength = ((size) / totalNodes) * (2 * Math.PI);
 
-    cylinder.position.y = baseHeight;
-    scene.add(cylinder);
-    scene.add(cylinderEdges);
+        var geometry = new THREE.CylinderGeometry(width, width, height, 30, 5, false, thetaStart, thetaLength);
+        var material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+        var cylinder = new THREE.Mesh(geometry, material);
+        var cylinderEdges = new THREE.EdgesHelper(cylinder, 0x888888);
+
+        cylinder.position.y = baseHeight;
+        scene.add(cylinder);
+        scene.add(cylinderEdges);
+    }
     
 }
 

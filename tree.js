@@ -141,8 +141,6 @@ Note:
  */
 function countSunburstNodeOffset(node, previousSiblingsSum){
 
-    console.log("Actual: " + node.latin);
-    console.log("Parent: " + node.parent.latin);
     //assign position to current node
     node.offset = node.parent.offset + previousSiblingsSum;
 
@@ -163,37 +161,44 @@ Description:
 Note:
     Parent is assigning itself to children.parent of all its children.
     Root has null parent, as there is no parent to assign itself into position.
+    TODO: Resolve approach of getting values of attributes
  */
 function createNode(node) {
 
-    var attributes = node.getElementsByTagName('attribute');
+
+    var firstNodeAttributeElement = node.children[0];
+    var secondNodeAttributeElement = node.children[1];
+
     var childElements = node.children;
-    console.log(childElements.length);
+
+    //var attributes = node.getElementsByTagName('attribute');
 
     //latin and english names of species are obtained by accessing direct positions
     //correct output depends on exact XML structure
-    for(var i = 0; i < 3; i++) {
-        var actual = attributes[i];
-        console.log(actual.getAttribute('name') + ": " + actual.getAttribute('value') + " \n");
-    }
+    var latin = "";
+    var english = "";
 
-    var latin   = attributes[0].getAttribute('value');
-    var english = attributes[1].getAttribute('value');
+
+    //Javascript black magic. 'If' statement apparently does type casting. What a time to be alive.
+    //Careful: Does not work without 'if' statement.
+    if (firstNodeAttributeElement.nodeType === 1) {
+        latin = firstNodeAttributeElement.getAttribute('value');
+    }
+    if (secondNodeAttributeElement.nodeType === 1) {
+        english = secondNodeAttributeElement.getAttribute('value');
+    }
 
     //array filled on return of recursive function
     var childrenList = [];
     var size = 0;
 
     if(node.tagName == 'leaf'){
-        console.log("Found leaf: " + latin);
         size = 1;
     }
     if(node.tagName == 'branch'){
 
-        console.log("Found branch: " + latin);
-
         //create child nodes of this branch
-        for(i = 0; i < childElements.length; i++){
+        for(var i = 0; i < childElements.length; i++){
 
             var actualChild = childElements.item(i);
 
