@@ -1,0 +1,23 @@
+ <!DOCTYPE html>
+    <html>
+        <head>
+            <title>Sunburst3D</title>
+            <script src = "three.min.js"></script>
+            <script src = "main.js"></script>
+            <script src = "OrbitControls.js"></script>
+            <script src = "tree.js"></script>
+            <script src = "loadXML.js"></script>
+        </head>
+        <body>
+            <script>
+            var fileName = 'data/completeDataExample.xml';
+            var data = loadXML(fileName);
+            tree = createTree(data);
+
+            window.init(tree);
+            window.animate();
+ 
+            </script> 
+        </body>
+
+    </html>

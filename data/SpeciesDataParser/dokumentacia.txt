@@ -1,0 +1,1 @@
+Pri vacsich suboroch nefunguje korektne, moznost opravit pomocou online Json validatorov - vznika tam ; symbol navyse pred child node. Pre pouzitie staci prepisat property file, zadava sa iba vstupny subor vystupny subor a prvy riadok root elementu v xml subore.
