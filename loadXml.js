@@ -1,39 +1,14 @@
-/*function loadXmlData(dataset) {
+/*
+Description:
+	Function takes a string argument of file path/name and loads XML.
+	XML is parsed into DOM object using DOMParser class.
 
-	this.data = Tree(dataset);
-	
-	var actual = data._root;
-	var depth = 0;
-	var latin;
-	var english;
-	var child;
-	var line;
+Note:
+	Path begins in root directory of project.
 
-	line = loadNextLine();
-	while(mameriadky a depth >= 0)
-
-		if(branch){
-			depth += 1;
-		}
-
-		if(\branch){
-			depth -= 1;
-		}
-
-		if(leaf){
-			child.latin = parseNextLine();
-			child.english = parseNextLine();
-			actual.children.push(child);
-		}
-
-		if(\leaf){
-			nothing;
-		}
-
-
-		line = loadNextLine();
-}*/
-
+Example:
+	loadXML('data/exampleDataFile.xml')
+ */
 function loadXML (fileName) {
 
 	var xml = new XMLHttpRequest();
@@ -44,10 +19,8 @@ function loadXML (fileName) {
 	if(!xmlData){
 		var parser = new DOMParser();
 		xmlData = parser.parseFromString(xml.responseText,"text/xml");
-		
 	}
 	
-
 	return xmlData;
 }
 

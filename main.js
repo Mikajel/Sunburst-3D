@@ -105,10 +105,11 @@ function drawCylinderPartition(scene, maxDepth, totalNodes, depth, offset, size,
         var thetaStart = (offset / totalNodes) * (2 * Math.PI);
         var thetaLength = ((size) / totalNodes) * (2 * Math.PI);
 
-        var geometry = new THREE.CylinderGeometry(width, width, height, 30, 5, false, thetaStart, thetaLength);
+        //value*thetaLength guarantees proportional distribution of edges along side of cylinder
+        var geometry = new THREE.CylinderGeometry(width, width, height, 5*thetaLength, 5, false, thetaStart, thetaLength);
         var material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
         var cylinder = new THREE.Mesh(geometry, material);
-        var cylinderEdges = new THREE.EdgesHelper(cylinder, 0x888888);
+        var cylinderEdges = new THREE.EdgesHelper(cylinder, 0xffffff);
 
         cylinder.position.y = baseHeight;
         scene.add(cylinder);
