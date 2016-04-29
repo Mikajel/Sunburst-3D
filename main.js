@@ -15,8 +15,6 @@ function init (tree) {
 
     scene = new THREE.Scene();
 
-
-
     camera = new THREE.OrthographicCamera(
         window.innerWidth / -2,   // Left
         window.innerWidth / 2,    // Right
@@ -42,7 +40,13 @@ function init (tree) {
     controls.dampingFactor = 0.25;
     controls.enableZoom = true;
 
-    drawCylinderTree(scene, tree);
+    //3D parent object containing all cylinder object
+    var sunburst = new THREE.Object3D();
+    //add sunburst into a tree
+    scene.add(sunburst);
+
+    //fill sunburst with cylinder partitions
+    drawCylinderTree(sunburst, tree);
 
     light = new THREE.AmbientLight( 0x222222 );
     light.position.set( 100, 200, 100 );
@@ -65,9 +69,9 @@ Description:
     Draws Sunburst visualization to the scene.
     Requires custom tree on input.
  */
-function drawCylinderTree(scene, tree){
+function drawCylinderTree(sunburst, tree){
 
-    drawCylinderNode(scene, tree.depth, tree.leafNumber, tree.root);
+    drawCylinderNode(sunburst, tree.depth, tree.leafNumber, tree.root);
 }
 
 /*
@@ -77,13 +81,13 @@ Description:
 Note:
     Call this function for root node to draw Sunburst.
  */
-function drawCylinderNode(scene, maxDepth, totalNodes, node){
+function drawCylinderNode(sunburst, maxDepth, totalNodes, node){
 
     //draw myself
-    drawCylinderPartition(scene, maxDepth, totalNodes, node.depth, node.offset, node.size, node.color);
+    drawCylinderPartition(sunburst, maxDepth, totalNodes, node.depth, node.offset, node.size, node.color);
     //initiate drawing of all children recursively
     for(var i = 0; i < node.childList.length; i++){
-        drawCylinderNode(scene, maxDepth, totalNodes, node.childList[i]);
+        drawCylinderNode(sunburst, maxDepth, totalNodes, node.childList[i]);
     }
 }
 
@@ -94,7 +98,7 @@ Note:
     Uses THREE.js CylinderGeometry to add cylinder partition into scene.
     BaseHeight decreases with depth - deepest partitions are in height 0 and root is on a top.
 */
-function drawCylinderPartition(scene, maxDepth, totalNodes, depth, offset, size, color){
+function drawCylinderPartition(sunburst, maxDepth, totalNodes, depth, offset, size, color){
 
     if(depth < maxDepth) {
         var width = 100 + 50 * depth;
@@ -112,8 +116,8 @@ function drawCylinderPartition(scene, maxDepth, totalNodes, depth, offset, size,
         var cylinderEdges = new THREE.EdgesHelper(cylinder, 0xffffff);
 
         cylinder.position.y = baseHeight;
-        scene.add(cylinder);
-        scene.add(cylinderEdges);
+        sunburst.add(cylinder);
+        sunburst.add(cylinderEdges);
     }
     
 }
