@@ -25,7 +25,9 @@ function init (tree) {
         1000 ); 
 
     //camera field of view
-    fov = camera.fov, zoom = 1.0, inc = -0.01;
+    fov = camera.fov;
+    zoom = 1.0;
+    inc = -0.01;
 
     //move camera to default view angle
     camera.position.y = 150;
@@ -41,7 +43,7 @@ function init (tree) {
     controls.enableZoom = true;
 
     //3D parent object containing all cylinder object
-    var sunburst = new THREE.Object3D();
+    sunburst = new THREE.Object3D();
     //add sunburst into a tree
     scene.add(sunburst);
 
@@ -56,8 +58,14 @@ function init (tree) {
     renderer.setClearColor( 0xdddddd, 1);
     renderer.render( scene, camera );
 
+    //variables for tracking mouse movement
+    projector = new THREE.Projector();
+    mouseVector = new THREE.Vector3();
+
+    //event listeners
+    window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'resize', onWindowResize, false );
-    window.addEventListener( 'mousewheel', mousewheel, false );
+    window.addEventListener( 'mousewheel', mouseWheel, false );
     // firefox, screw firefox, use Chrome
 	//window.addEventListener( 'DOMMouseScroll', mousewheel, false );
     window.animate();
@@ -140,21 +148,42 @@ function animate () {
     controls.update(); // required if controls.enableDamping = true, or if controls.autoRotate = true
 
     //stats.update();
+}
 
+/*
+Description:
+    Catching mouse cursor move event.
+    Highlights selected partition of sunburst.
+    TODO: Currently not working.
+    TODO: Displaying partition latin name.
+Note:
+    Works on ray casting principle.
+    Catches all objects into array, highlights only nearest one.
+ */
+function onMouseMove( event ){
+    mouseVector.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouseVector.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    //var raycaster = projector.pickingRay( mouseVector.clone(), camera );
 
-
-};
+    //array of targeted objects, ordered by distance - near to far
+    //var intersects = raycaster.intersectObjects( sunburst.children );
+    //black out selected partition
+    //intersects[0].object.color = 0x000000;
+}
 
 function render() {
 
     camera.fov = fov * zoom;
     camera.updateProjectionMatrix();
     renderer.render( scene, camera );
+}
 
-};
-
-function mousewheel( e ) {      
-    var d = ((typeof e.wheelDelta != "undefined")?(-e.wheelDelta):e.detail);
+/*
+Description:
+    Zooming camera on catching mouse wheel event.
+ */
+function mouseWheel( event ) {
+    var d = ((typeof event.wheelDelta != "undefined")?(-event.wheelDelta):event.detail);
     d = 100 * ((d>0)?1:-1);
 
     var cPos = camera.position;
