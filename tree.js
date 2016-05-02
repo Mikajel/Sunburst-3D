@@ -161,7 +161,6 @@ Description:
 Note:
     Parent is assigning itself to children.parent of all its children.
     Root has null parent, as there is no parent to assign itself into position.
-    TODO: Resolve approach of getting values of attributes
  */
 function createNode(node) {
 

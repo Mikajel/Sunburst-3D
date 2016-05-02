@@ -14,15 +14,11 @@ function init (tree) {
     document.body.appendChild( renderer.domElement );
 
     scene = new THREE.Scene();
+    mouse = new THREE.Vector2();
 
-    camera = new THREE.OrthographicCamera(
-        window.innerWidth / -2,   // Left
-        window.innerWidth / 2,    // Right
-        window.innerHeight / 1,   // Top
-        window.innerHeight / -2,  // Bottom
-        //this sets render distance of camera
-        -2000,            // Near clipping plane
-        1000 ); 
+    raycaster = new THREE.Raycaster();
+
+    camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 100, 10000 );
 
     //camera field of view
     fov = camera.fov;
@@ -42,13 +38,10 @@ function init (tree) {
     controls.dampingFactor = 0.25;
     controls.enableZoom = true;
 
-    //3D parent object containing all cylinder object
-    sunburst = new THREE.Object3D();
-    //add sunburst into a tree
-    scene.add(sunburst);
+
 
     //fill sunburst with cylinder partitions
-    drawCylinderTree(sunburst, tree);
+    drawCylinderTree(scene, tree);
 
     light = new THREE.AmbientLight( 0x222222 );
     light.position.set( 100, 200, 100 );
@@ -72,14 +65,18 @@ function init (tree) {
 
 }
 
+function selectSubroot(sunburst){
+
+}
+
 /*
 Description:
     Draws Sunburst visualization to the scene.
     Requires custom tree on input.
  */
-function drawCylinderTree(sunburst, tree){
+function drawCylinderTree(scene, tree){
 
-    drawCylinderNode(sunburst, tree.depth, tree.leafNumber, tree.root);
+    drawCylinderNode(scene, tree.depth, tree.leafNumber, tree.root);
 }
 
 /*
@@ -89,13 +86,13 @@ Description:
 Note:
     Call this function for root node to draw Sunburst.
  */
-function drawCylinderNode(sunburst, maxDepth, totalNodes, node){
+function drawCylinderNode(scene, maxDepth, totalNodes, node){
 
     //draw myself
-    drawCylinderPartition(sunburst, maxDepth, totalNodes, node.depth, node.offset, node.size, node.color);
+    drawCylinderPartition(scene, maxDepth, totalNodes, node.depth, node.offset, node.size, node.color);
     //initiate drawing of all children recursively
     for(var i = 0; i < node.childList.length; i++){
-        drawCylinderNode(sunburst, maxDepth, totalNodes, node.childList[i]);
+        drawCylinderNode(scene, maxDepth, totalNodes, node.childList[i]);
     }
 }
 
@@ -106,26 +103,26 @@ Note:
     Uses THREE.js CylinderGeometry to add cylinder partition into scene.
     BaseHeight decreases with depth - deepest partitions are in height 0 and root is on a top.
 */
-function drawCylinderPartition(sunburst, maxDepth, totalNodes, depth, offset, size, color){
+function drawCylinderPartition(scene, maxDepth, totalNodes, depth, offset, size, color){
 
     if(depth < maxDepth) {
         var width = 100 + 50 * depth;
-        var baseHeight = 40 * (maxDepth - depth);
-        var height = 40;
+        var baseHeight = 20 * (maxDepth - depth);
+        var height = 20;
 
         //count angular start and end of partition on circle
         var thetaStart = (offset / totalNodes) * (2 * Math.PI);
         var thetaLength = ((size) / totalNodes) * (2 * Math.PI);
 
         //value*thetaLength guarantees proportional distribution of edges along side of cylinder
-        var geometry = new THREE.CylinderGeometry(width, width, height, 5*thetaLength, 5, false, thetaStart, thetaLength);
+        var geometry = new THREE.CylinderGeometry(width, width, height, 75*thetaLength, 5, false, thetaStart, thetaLength);
         var material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
         var cylinder = new THREE.Mesh(geometry, material);
         var cylinderEdges = new THREE.EdgesHelper(cylinder, 0xffffff);
 
         cylinder.position.y = baseHeight;
-        sunburst.add(cylinder);
-        sunburst.add(cylinderEdges);
+        scene.add(cylinder);
+        scene.add(cylinderEdges);
     }
     
 }
@@ -134,10 +131,9 @@ function onWindowResize ()  {
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-};
+}
 
 function animate () {
 
@@ -153,29 +149,47 @@ function animate () {
 /*
 Description:
     Catching mouse cursor move event.
-    Highlights selected partition of sunburst.
-    TODO: Currently not working.
-    TODO: Displaying partition latin name.
-Note:
-    Works on ray casting principle.
-    Catches all objects into array, highlights only nearest one.
+    Updating 2D position of mouse cursor.
  */
 function onMouseMove( event ){
-    mouseVector.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouseVector.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    //var raycaster = projector.pickingRay( mouseVector.clone(), camera );
+    //I have literally no idea why this works with such constants
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-    //array of targeted objects, ordered by distance - near to far
-    //var intersects = raycaster.intersectObjects( sunburst.children );
-    //black out selected partition
-    //intersects[0].object.color = 0x000000;
 }
 
 function render() {
 
     camera.fov = fov * zoom;
     camera.updateProjectionMatrix();
+    update();
     renderer.render( scene, camera );
+}
+
+/*
+Description:
+    Highlights selected partition of sunburst.
+    TODO: Currently not working. Intersect hits objects but color does not change.
+    TODO: confirmed on geometry type, yet color cannot be accessed
+    TODO: Displaying partition latin name.
+Note:
+    Works on ray casting principle.
+    Catches all objects into array, highlights only nearest one.
+ */
+function update() {
+
+    //cast ray to go through objects
+    raycaster.setFromCamera(mouse, camera);
+    //array of targeted objects, ordered by distance - near to far
+    var intersects = raycaster.intersectObjects( scene.children );
+    //black out targeted partition of sunburst
+    if (intersects.length > 0) {
+
+        if(intersects[0].object.geometry.type == 'CylinderGeometry'){
+
+            intersects[0].object.color.setHex( 0x000000 );
+        }
+    }
 }
 
 /*
