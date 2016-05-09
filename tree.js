@@ -19,6 +19,7 @@ function Node(latin, english, children, size) {
     this.english = english;
     this.parent = null;
     this.childList = children;
+    this.sceneObject = null;
 
 
     //size is required for deciding angle of cylinder
@@ -219,7 +220,8 @@ function createNode(node) {
 
     return thisNode;
 }
-/*Description:
+/*
+Description:
     Function for assigning value to a single node.
     Recursively searches tree under node and returns sum of all leaves.
 
@@ -247,7 +249,7 @@ function getNodeValue(node) {
 }
 
 /*
- Description:
+Description:
     Create tree of nodes containing animal XML data ready to be displayed as 3D Sunburst.
  */
 function createTree(data) {
@@ -257,4 +259,40 @@ function createTree(data) {
     assignTreeGraphicParameters(xmlDataTree);
 
     return xmlDataTree;
+}
+
+/*
+Description:
+    Function for finding node by its scene object.
+ */
+function getSceneObjectNode(node, scenePartition){
+
+    var sceneObjectNode = null;
+
+    if(node.sceneObject.id == scenePartition.id){
+
+        return node;
+        console.log("Returning color of: " + sceneObjectNode.latin);
+    }
+    else{
+
+        for( var i = 0; i < node.childList.length; i++) {
+            var childFound = getSceneObjectNode(node.childList[i], scenePartition);
+
+            if(childFound != null)
+                return childFound
+        }
+    }
+}
+
+/*
+Description:
+    To be called upon root for refreshing color of tree when moving over partitions.
+ */
+function refreshTreeColors(node){
+
+    for( var i = 0; i < node.childList.length; i++){
+        node.childList[i].sceneObject.object.material.color.setHex(node.childList[i].color);
+        refreshTreeColors(node.childList[i]);
+    }
 }

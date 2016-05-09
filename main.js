@@ -1,3 +1,6 @@
+
+var lastAccessedObject;
+
 /*
 Description:
     Function for rendering Sunburst 3d diagram.
@@ -10,7 +13,7 @@ Note:
 function init (tree) {
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( window.innerWidth, window.innerHeight);
     document.body.appendChild( renderer.domElement );
 
     scene = new THREE.Scene();
@@ -59,8 +62,12 @@ function init (tree) {
     window.addEventListener( 'mousemove', onMouseMove, false );
     window.addEventListener( 'resize', onWindowResize, false );
     window.addEventListener( 'mousewheel', mouseWheel, false );
+
+    lastAccessedObject = tree.root.sceneObject;
+
     // firefox, screw firefox, use Chrome
 	//window.addEventListener( 'DOMMouseScroll', mousewheel, false );
+
     window.animate();
 
 }
@@ -89,7 +96,7 @@ Note:
 function drawCylinderNode(scene, maxDepth, totalNodes, node){
 
     //draw myself
-    drawCylinderPartition(scene, maxDepth, totalNodes, node.depth, node.offset, node.size, node.color);
+    drawCylinderPartition(scene, maxDepth, totalNodes, node);
     //initiate drawing of all children recursively
     for(var i = 0; i < node.childList.length; i++){
         drawCylinderNode(scene, maxDepth, totalNodes, node.childList[i]);
@@ -103,26 +110,30 @@ Note:
     Uses THREE.js CylinderGeometry to add cylinder partition into scene.
     BaseHeight decreases with depth - deepest partitions are in height 0 and root is on a top.
 */
-function drawCylinderPartition(scene, maxDepth, totalNodes, depth, offset, size, color){
+function drawCylinderPartition(scene, maxDepth, totalNodes, node){
 
-    if(depth < maxDepth) {
-        var width = 100 + 50 * depth;
-        var baseHeight = 20 * (maxDepth - depth);
+    if(node.depth < maxDepth) {
+        var width = 100 + 50 * node.depth;
+        var baseHeight = 20 * (maxDepth - node.depth);
         var height = 20;
 
         //count angular start and end of partition on circle
-        var thetaStart = (offset / totalNodes) * (2 * Math.PI);
-        var thetaLength = ((size) / totalNodes) * (2 * Math.PI);
+        var thetaStart = (node.offset / totalNodes) * (2 * Math.PI);
+        var thetaLength = ((node.size) / totalNodes) * (2 * Math.PI);
 
         //value*thetaLength guarantees proportional distribution of edges along side of cylinder
         var geometry = new THREE.CylinderGeometry(width, width, height, 75*thetaLength, 5, false, thetaStart, thetaLength);
-        var material = new THREE.MeshBasicMaterial({color: color, side: THREE.DoubleSide});
+        var material = new THREE.MeshBasicMaterial({color: node.color, side: THREE.DoubleSide});
         var cylinder = new THREE.Mesh(geometry, material);
         var cylinderEdges = new THREE.EdgesHelper(cylinder, 0xffffff);
 
+        //move partition to its designated height
         cylinder.position.y = baseHeight;
+
+        //
+        node.sceneObject = cylinder;
         scene.add(cylinder);
-        scene.add(cylinderEdges);
+        //scene.add(cylinderEdges);
     }
     
 }
@@ -169,8 +180,7 @@ function render() {
 /*
 Description:
     Highlights selected partition of sunburst.
-    TODO: Currently not working. Intersect hits objects but color does not change.
-    TODO: confirmed on geometry type, yet color cannot be accessed
+    TODO: Currently only works with one color, redefine scene object tree to revert to original color
     TODO: Displaying partition latin name.
 Note:
     Works on ray casting principle.
@@ -185,10 +195,30 @@ function update() {
     //black out targeted partition of sunburst
     if (intersects.length > 0) {
 
-        if(intersects[0].object.geometry.type == 'CylinderGeometry'){
+        var targetedObject = intersects[0];
 
-            intersects[0].object.color.setHex( 0x000000 );
+        //black out targeted node
+        targetedObject.object.material.color.setHex(0x000000);
+        
+        //if I moved on another object
+        if(targetedObject.object != lastAccessedObject) {
+
+            var targetedObjectNode = getSceneObjectNode(tree.root, targetedObject.object);
+            document.getElementById("latinWindow").innerHTML = targetedObjectNode.latin;
+            //get node of blacked out object
+            var lastAccessedObjectNode = getSceneObjectNode(tree.root, lastAccessedObject);
+
+            //create new color by force - #000000 format to 0x000000 format
+            var colors = lastAccessedObjectNode.color.split("#");
+            var color = ("0x" + colors[1]);
+
+            //apply the original color
+            if (lastAccessedObjectNode != null) {
+                lastAccessedObjectNode.sceneObject.material.color.setHex(color);
+            }
         }
+        
+        lastAccessedObject = targetedObject.object;
     }
 }
 

@@ -1,100 +1,100 @@
 <branch>
-<attribute name="latin_name" value="Maruina"/>
+<attribute name="latin_name" value="Zviratka"/>
 <attribute name="common_name" value=""/>
 <attribute name="rank" value="Genus"/>
     <branch>
-        <attribute name="latin_name" value="Hero"/>
+        <attribute name="latin_name" value="Male zviratka"/>
         <attribute name="common_name" value=""/>
         <attribute name="rank" value="subGenus"/>
         <branch>
-            <attribute name="latin_name" value="Warrior"/>
+            <attribute name="latin_name" value="Slimaciky"/>
             <attribute name="common_name" value=""/>
             <attribute name="rank" value="subsubGenus"/>
             <branch>
-                <attribute name="latin_name" value="Maruina boulderina"/>
+                <attribute name="latin_name" value="Modre slimaciky"/>
                 <attribute name="common_name" value=""/>
                 <attribute name="rank" value="Species"/>
                 <leaf>
-                    <attribute name="latin_name" value="Maruina boulderina"/>
+                    <attribute name="latin_name" value="Slimak Rudko"/>
                     <attribute name="common_name" value=""/>
                     <attribute name="rank" value="Species"/>
                 </leaf>
                 <leaf>
-                    <attribute name="latin_name" value="Maruina boulderina"/>
+                    <attribute name="latin_name" value="Slimak Andrej"/>
                     <attribute name="common_name" value=""/>
                     <attribute name="rank" value="Species"/>
                 </leaf>
                 <leaf>
-                    <attribute name="latin_name" value="Maruina boulderina"/>
+                    <attribute name="latin_name" value="Slimacica Zuzka"/>
                     <attribute name="common_name" value=""/>
                     <attribute name="rank" value="Species"/>
                 </leaf>
                 <leaf>
-                    <attribute name="latin_name" value="Maruina boulderina"/>
+                    <attribute name="latin_name" value="Praslimak Robert"/>
                     <attribute name="common_name" value=""/>
                     <attribute name="rank" value="Species"/>
                 </leaf>
                 <leaf>
-                    <attribute name="latin_name" value="Maruina boulderina"/>
+                    <attribute name="latin_name" value="Slimacica fesanda"/>
                     <attribute name="common_name" value=""/>
                     <attribute name="rank" value="Species"/>
                 </leaf>
 
                 <leaf>
-                    <attribute name="latin_name" value="Maruina boulderina"/>
+                    <attribute name="latin_name" value="Slimaciatko"/>
                     <attribute name="common_name" value=""/>
                     <attribute name="rank" value="Species"/>
                 </leaf>
             </branch>
             <leaf>
-                <attribute name="latin_name" value="Garrosh Hellscream"/>
+                <attribute name="latin_name" value="Zlty slimak Emil"/>
                 <attribute name="common_name" value=""/>
                 <attribute name="rank" value="Species"/>
             </leaf>
             <leaf>
-                <attribute name="latin_name" value="Magni Bronzebeard"/>
+                <attribute name="latin_name" value="Biely slimak Vladko"/>
                 <attribute name="common_name" value=""/>
                 <attribute name="rank" value="Species"/>
             </leaf>
             <leaf>
-                <attribute name="latin_name" value="Maruina boulderina"/>
+                <attribute name="latin_name" value="Ruzova slimacica Milka"/>
                 <attribute name="common_name" value=""/>
                 <attribute name="rank" value="Species"/>
             </leaf>
             <leaf>
-                <attribute name="latin_name" value="Maruina boulderina"/>
+                <attribute name="latin_name" value="Fialovy slimak Petrik"/>
                 <attribute name="common_name" value=""/>
                 <attribute name="rank" value="Species"/>
             </leaf>
             <leaf>
-                <attribute name="latin_name" value="Maruina boulderina"/>
+                <attribute name="latin_name" value="Oranzova slimacica Drahusa"/>
                 <attribute name="common_name" value=""/>
                 <attribute name="rank" value="Species"/>
             </leaf>
         </branch>
         <leaf>
-            <attribute name="latin_name" value="Jaina"/>
+            <attribute name="latin_name" value="Macicka Micka"/>
             <attribute name="common_name" value=""/>
             <attribute name="rank" value="Species"/>
         </leaf>
         <leaf>
-            <attribute name="latin_name" value="GulDan"/>
+            <attribute name="latin_name" value="Psik Dunco"/>
             <attribute name="common_name" value=""/>
             <attribute name="rank" value="Species"/>
         </leaf>
     </branch>
     <leaf>
-        <attribute name="latin_name" value="Maruina boulderina"/>
+        <attribute name="latin_name" value="Krokodil Brano"/>
         <attribute name="common_name" value=""/>
         <attribute name="rank" value="Species"/>
     </leaf>
     <leaf>
-        <attribute name="latin_name" value="Maruina lanceolata"/>
+        <attribute name="latin_name" value="Kravicka Marika"/>
         <attribute name="common_name" value=""/>
         <attribute name="rank" value="Species"/>
     </leaf>
     <leaf>
-        <attribute name="latin_name" value="Maruina pennaki"/>
+        <attribute name="latin_name" value="Slon Juraj"/>
         <attribute name="common_name" value=""/>
         <attribute name="rank" value="Species"/>
     </leaf>

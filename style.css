@@ -1,0 +1,10 @@
+
+#latinWindow {
+    width: 200px;
+    height: 100px;
+    position: fixed;
+    top: 30px;
+    left: 50px;
+
+    font-size: 25px;
+}
