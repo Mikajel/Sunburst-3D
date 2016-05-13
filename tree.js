@@ -263,6 +263,25 @@ function createTree(data) {
 
 /*
 Description:
+    Creates and returns a subtree with given node as a root.
+    All inner graphic parameters are fixed(tree depth, node depths, offsets, ...).
+
+Note:
+    Passing subtree inside because of incorrect programming earlier, creating a dummy tree requires parsing whole XML.
+ */
+function createSubtreeFromTree(subtree, node){
+
+    var newRootNode = jQuery.extend(true, {}, node);
+    var newSubtree = jQuery.extend(true, {}, subtree);
+    
+    newSubtree.root = newRootNode;
+    assignTreeGraphicParameters(newSubtree);
+    
+    return newSubtree;
+}
+
+/*
+Description:
     Function for finding node by its scene object.
  */
 function getSceneObjectNode(node, scenePartition){
@@ -288,6 +307,10 @@ function getSceneObjectNode(node, scenePartition){
 /*
 Description:
     To be called upon root for refreshing color of tree when moving over partitions.
+
+Note:
+    DEPRECATED
+    Omitted for being too slow in current build.
  */
 function refreshTreeColors(node){
 

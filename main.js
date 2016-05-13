@@ -1,5 +1,8 @@
-
+var tree;
+var subtree;
 var lastAccessedObject;
+
+
 
 /*
 Description:
@@ -10,7 +13,11 @@ Note:
     Tested straight-edge pyramid style of graph, looked like shit tho. Staying with mayan-style pyramid for now.
     TODO: Break giant function into smaller functions. Probably not going TODO it. LOL.
  */
-function init (tree) {
+function init (data) {
+    
+    //tree always remembers whole tree, subtree only gets portion of it to create scene
+    tree = createTree(data);
+    subtree = createTree(data);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight);
@@ -21,7 +28,7 @@ function init (tree) {
 
     raycaster = new THREE.Raycaster();
 
-    camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 100, 10000 );
+    camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 10, 10000 );
 
     //camera field of view
     fov = camera.fov;
@@ -29,8 +36,8 @@ function init (tree) {
     inc = -0.01;
 
     //move camera to default view angle
-    camera.position.y = 150;
-    camera.position.z = 75;
+    camera.position.y = 300;
+    camera.position.z = 200;
     
     camera.lookAt( scene.position );
     scene.add(camera);
@@ -41,10 +48,8 @@ function init (tree) {
     controls.dampingFactor = 0.25;
     controls.enableZoom = true;
 
-
-
     //fill sunburst with cylinder partitions
-    drawCylinderTree(scene, tree);
+    drawCylinderTree(scene, subtree);
 
     light = new THREE.AmbientLight( 0x222222 );
     light.position.set( 100, 200, 100 );
@@ -60,20 +65,45 @@ function init (tree) {
 
     //event listeners
     window.addEventListener( 'mousemove', onMouseMove, false );
-    window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener( 'mousedown', onMouseDown, false );
+    window.addEventListener( 'resize', onResize, false );
     window.addEventListener( 'mousewheel', mouseWheel, false );
 
-    lastAccessedObject = tree.root.sceneObject;
+    lastAccessedObject = subtree.root.sceneObject;
 
-    // firefox, screw firefox, use Chrome
+    //for firefox, screw firefox, use Chrome
 	//window.addEventListener( 'DOMMouseScroll', mousewheel, false );
 
     window.animate();
 
 }
 
-function selectSubroot(sunburst){
+/*
+Description:
+    Creates a selection subtree to overwrite visualization.
 
+Note:
+    Selecting root of actual visualization will do nothing.
+ */
+function subtreeSelection(node){
+    subtree = createSubtreeFromTree(subtree, node);
+    console.log("Hello");
+}
+
+/*
+Description:
+    Removes all elements from scene.
+    Works in cycle removing first child of scene until all objects are gone - array of children ahs zero length.
+
+Note:
+    To be called on re-drawing scene after node selection.
+ */
+function emptyScene(scene){
+
+    while(scene.children.length > 0){
+        var objectToRemove = scene.children[0];
+        scene.remove(objectToRemove);
+    }
 }
 
 /*
@@ -81,9 +111,9 @@ Description:
     Draws Sunburst visualization to the scene.
     Requires custom tree on input.
  */
-function drawCylinderTree(scene, tree){
+function drawCylinderTree(scene, subtree){
 
-    drawCylinderNode(scene, tree.depth, tree.leafNumber, tree.root);
+    drawCylinderNode(scene, subtree.depth, subtree.leafNumber, subtree.root);
 }
 
 /*
@@ -138,7 +168,7 @@ function drawCylinderPartition(scene, maxDepth, totalNodes, node){
     
 }
 
-function onWindowResize ()  {
+function onResize ()  {
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -146,6 +176,38 @@ function onWindowResize ()  {
 
 }
 
+/*
+Description:
+    Creating a subtree if node was clicked.
+ */
+function onMouseDown ( event ) {
+
+    raycaster.setFromCamera( mouse, camera );
+    var intersects = raycaster.intersectObjects( scene.children );
+
+    if ( intersects.length > 0 ) {
+        emptyScene(scene);
+
+        console.log(intersects.length);
+
+        var targetedObject = intersects[0];
+        var targetedObjectNode = getSceneObjectNode(subtree.root, targetedObject.object);
+
+        subtreeSelection(targetedObjectNode);
+        drawCylinderTree(scene, subtree);
+        //this HAS to be called after drawing
+        //else lastAccessedObject will refer to non-existing sceneObject re-written by drawing
+        lastAccessedObject = subtree.root.sceneObject;
+    }
+}
+
+/*
+Description:
+    Updates the scene.
+    Actions to happen should be called from render() function.
+Note:
+    Yeah, I copied this from some examples. No sweat.
+ */
 function animate () {
 
     requestAnimationFrame( animate );
@@ -161,6 +223,9 @@ function animate () {
 Description:
     Catching mouse cursor move event.
     Updating 2D position of mouse cursor.
+
+Note:
+    Used for ray casting to detect targeting objects with a mouse.
  */
 function onMouseMove( event ){
     //I have literally no idea why this works with such constants
@@ -179,12 +244,24 @@ function render() {
 
 /*
 Description:
+    Converts #ffffff format to 0xffffff format.
+    Returns 0xffffff format variable.
+    TODO: whole thing
+ */
+function getColorFormatX( color ){
+    
+    
+    
+}
+
+/*
+Description:
     Highlights selected partition of sunburst.
-    TODO: Currently only works with one color, redefine scene object tree to revert to original color
-    TODO: Displaying partition latin name.
+    Displays latin name of node in upper left corner.
 Note:
     Works on ray casting principle.
-    Catches all objects into array, highlights only nearest one.
+    Catches all objects into an array, highlights only nearest one.
+    TODO: Now only blacks out, finish in highlighting manner. Use proportional highlighting.
  */
 function update() {
 
@@ -197,28 +274,39 @@ function update() {
 
         var targetedObject = intersects[0];
 
-        //black out targeted node
+        //color out targeted node
+        //TODO: get correct hexadecimal format.
+        //var actualColor =
         targetedObject.object.material.color.setHex(0x000000);
+
+        var targetedObjectNode = getSceneObjectNode(subtree.root, targetedObject.object);
+        document.getElementById("latinWindow").innerHTML = targetedObjectNode.latin;
+        //get node of blacked out object
+        var lastAccessedObjectNode = getSceneObjectNode(subtree.root, lastAccessedObject);
+
+        //create new color by force - #000000 format to 0x000000 format
+        var colors = lastAccessedObjectNode.color.split("#");
+        var color = ("0x" + colors[1]);
         
         //if I moved on another object
         if(targetedObject.object != lastAccessedObject) {
-
-            var targetedObjectNode = getSceneObjectNode(tree.root, targetedObject.object);
-            document.getElementById("latinWindow").innerHTML = targetedObjectNode.latin;
-            //get node of blacked out object
-            var lastAccessedObjectNode = getSceneObjectNode(tree.root, lastAccessedObject);
-
-            //create new color by force - #000000 format to 0x000000 format
-            var colors = lastAccessedObjectNode.color.split("#");
-            var color = ("0x" + colors[1]);
-
             //apply the original color
             if (lastAccessedObjectNode != null) {
                 lastAccessedObjectNode.sceneObject.material.color.setHex(color);
             }
         }
-        
+
         lastAccessedObject = targetedObject.object;
+    }
+    //if you run down from a node, remove highlighting and innerHTML
+    else{
+        var lastAccessedObjectNode = getSceneObjectNode(subtree.root, lastAccessedObject);
+        var colors = lastAccessedObjectNode.color.split("#");
+        var color = ("0x" + colors[1]);
+        if (lastAccessedObjectNode != null) {
+            lastAccessedObjectNode.sceneObject.material.color.setHex(color);
+        }
+        document.getElementById("latinWindow").innerHTML = "";
     }
 }
 

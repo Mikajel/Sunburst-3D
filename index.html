@@ -6,6 +6,7 @@
             <link rel="stylesheet" type="text/css" href="style.css">
 
             <script src = "three.min.js"></script>
+            <script src= "jquery.min.js"></script>
             <script src = "main.js"></script>
             <script src = "OrbitControls.js"></script>
             <script src = "tree.js"></script>
@@ -21,9 +22,7 @@
             //hack around "global variable" need
             var lastAccessedNode;
 
-            tree = createTree(data);
-            window.init(tree);
-
+            window.init(data);
             window.animate();
  
             </script>
