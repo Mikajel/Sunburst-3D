@@ -5,6 +5,7 @@ var tree;
 var subtree;
 var lastAccessedObject;
 var levelsToDisplay;
+var actualRootDepth;
 
 var renderer;
 var raycaster;
@@ -39,15 +40,19 @@ function init (data) {
     subtree = createTree(data);
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerHeight, window.innerHeight);
+    renderer.setSize( window.innerWidth, window.innerHeight);
     document.body.appendChild( renderer.domElement );
 
     scene = new THREE.Scene();
     mouse = new THREE.Vector2();
 
+    //set initial display depth to 2
+    levelsToDisplay = 2;
+    document.getElementById("displayedLevels").innerHTML = "Displayed levels: " + levelsToDisplay ;
+
     raycaster = new THREE.Raycaster();
 
-    camera = new THREE.PerspectiveCamera( 100, window.innerHeight/window.innerHeight, 10, 10000 );
+    camera = new THREE.PerspectiveCamera( 100, window.innerWidth/window.innerHeight, 10, 10000 );
 
     //camera field of view
     fov = camera.fov;
@@ -106,6 +111,17 @@ function keyDownResolver( event ){
     if(event.keyCode == 108){
 
         getUserInput();
+
+        emptyScene(scene);
+        //redraw the scene with desired number of levels
+        subtreeSelection(subtree.root);
+        drawCylinderTree(scene, subtree);
+        //this HAS to be called after drawing
+        //else lastAccessedObject will refer to non-existing sceneObject re-written by drawing
+        lastAccessedObject = subtree.root.sceneObject;
+
+        document.getElementById("displayedLevels").innerHTML = "Displayed levels: " + levelsToDisplay ;
+
     }
 
     if(event.keyCode == 107){
@@ -128,7 +144,7 @@ Note:
     Selecting root of actual visualization will do nothing.
  */
 function subtreeSelection(node){
-    createSubtreeFromTree(subtree, node);
+        createSubtreeFromTree(subtree, node);
 }
 
 /*
@@ -154,7 +170,11 @@ Description:
  */
 function drawCylinderTree(scene, subtree){
 
+    actualRootDepth = subtree.root.depth;
     drawCylinderNode(scene, subtree.depth, subtree.leafNumber, subtree.root);
+    
+    //set the label for actual root
+    document.getElementById("actualRoot").innerHTML = "Actual branch: " + subtree.root.latin;
 }
 
 /*
@@ -169,8 +189,12 @@ function drawCylinderNode(scene, maxDepth, totalNodes, node){
     //draw myself
     drawCylinderPartition(scene, maxDepth, totalNodes, node);
     //initiate drawing of all children recursively
-    for(var i = 0; i < node.childList.length; i++){
-        drawCylinderNode(scene, maxDepth, totalNodes, node.childList[i]);
+
+    //do not draw deeper than user wants
+    if(actualRootDepth + levelsToDisplay - 1 > node.depth) {
+        for (var i = 0; i < node.childList.length; i++) {
+            drawCylinderNode(scene, maxDepth, totalNodes, node.childList[i]);
+        }
     }
 }
 
@@ -186,7 +210,8 @@ function drawCylinderPartition(scene, maxDepth, totalNodes, node){
     if(node.depth < maxDepth) {
         var width = 100 + 50 * node.depth;
         var baseHeight = 20 * (maxDepth - node.depth);
-        var height = 20;
+        //one less so walls do not collide in graphical mess
+        var height = 19;
 
         //count angular start and end of partition on circle
         var thetaStart = (node.offset / totalNodes) * (2 * Math.PI);
@@ -268,7 +293,7 @@ Note:
  */
 function onMouseMove( event ){
     //I have literally no idea why this works with such constants
-    mouse.x = ( event.clientX / window.innerHeight ) * 2 - 1;
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 }

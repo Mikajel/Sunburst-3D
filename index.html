@@ -14,6 +14,19 @@
             <script src = "Projector.js"></script>
         </head>
         <body>
+
+            <!-- actual targeted node -->
+            <div style="color:#000000" class = "infoFrame" id="latinWindow">
+            </div>
+
+            <!-- actual root node -->
+            <div style = "color:#000000" class = "infoFrame" id="actualRoot">
+            </div>
+
+            <!-- number of displayed levels -->
+            <div style = "color:#000000" class = "infoFrame" id="displayedLevels">
+            </div>
+
             <script>
             var fileName = 'data/completeDataExample.xml';
             var data = loadXML(fileName);
@@ -22,9 +35,7 @@
             window.animate();
  
             </script>
-            <div style="color:#620bff" id="latinWindow">
-                <p>This is a paragraph.</p>
-            </div>
+
         </body>
 
     </html>

@@ -286,17 +286,21 @@ Description:
  */
 function getSceneObjectNodeById(node, scenePartition){
 
-    if(node.sceneObject.id == scenePartition.id){
+    //do not search nodes that are not on scene (not added because of depth)
+    if(node.sceneObject != null) {
+        //if we found the one
+        if (node.sceneObject.id == scenePartition.id) {
 
-        return node;
-    }
-    else{
+            return node;
+        }
+        else {
 
-        for( var i = 0; i < node.childList.length; i++) {
-            var childFound = getSceneObjectNodeById(node.childList[i], scenePartition);
+            for (var i = 0; i < node.childList.length; i++) {
+                var childFound = getSceneObjectNodeById(node.childList[i], scenePartition);
 
-            if(childFound != null)
-                return childFound
+                if (childFound != null)
+                    return childFound
+            }
         }
     }
 }
