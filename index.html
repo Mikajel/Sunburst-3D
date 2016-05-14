@@ -18,16 +18,15 @@
             var fileName = 'data/completeDataExample.xml';
             var data = loadXML(fileName);
 
-            //extremely wrong declaration, but then again, autistic monkey knows javascript better than me
-            //hack around "global variable" need
-            var lastAccessedNode;
-
             window.init(data);
             window.animate();
  
             </script>
-            <div style="color:#0000FF" id="latinWindow">
+            <div style="color:#620bff" id="latinWindow">
                 <p>This is a paragraph.</p>
+            </div>
+            <div id = "rewindButton">
+                <button onclick="drawParentGraph(subtree)">Level up</button>
             </div>
         </body>
 

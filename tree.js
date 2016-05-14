@@ -284,19 +284,40 @@ function createSubtreeFromTree(subtree, node){
 Description:
     Function for finding node by its scene object.
  */
-function getSceneObjectNode(node, scenePartition){
-
-    var sceneObjectNode = null;
+function getSceneObjectNodeById(node, scenePartition){
 
     if(node.sceneObject.id == scenePartition.id){
 
         return node;
-        console.log("Returning color of: " + sceneObjectNode.latin);
     }
     else{
 
         for( var i = 0; i < node.childList.length; i++) {
-            var childFound = getSceneObjectNode(node.childList[i], scenePartition);
+            var childFound = getSceneObjectNodeById(node.childList[i], scenePartition);
+
+            if(childFound != null)
+                return childFound
+        }
+    }
+}
+
+/*
+Description:
+    Finds node under subtree root by latin name.
+
+Note:
+    To be used when searching for subtree parent nodes in original tree.
+ */
+function getTreeNodeByLatinName(root, node){
+
+    if(root.latin == node.latin){
+
+        return root;
+    }
+    else{
+
+        for( var i = 0; i < root.childList.length; i++) {
+            var childFound = getTreeNodeByLatinName(root.childList[i], node);
 
             if(childFound != null)
                 return childFound

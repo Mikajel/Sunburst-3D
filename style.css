@@ -8,3 +8,11 @@
 
     font-size: 25px;
 }
+
+#rewindButton {
+    width: 200px;
+    height: 100px;
+    position: fixed;
+    top: 30px;
+    right: 250px;
+}

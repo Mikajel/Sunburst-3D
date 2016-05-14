@@ -1,6 +1,25 @@
+//extremely wrong declaration, but then again, autistic monkey knows javascript better than me
+//hack around "global variable" need
+
 var tree;
 var subtree;
 var lastAccessedObject;
+var levelsToDisplay;
+
+var renderer;
+var raycaster;
+var controls;
+var projector;
+var mouseVector;
+
+var scene;
+var mouse;
+var camera;
+var light;
+
+var fov;
+var zoom;
+var inc;
 
 
 
@@ -20,7 +39,7 @@ function init (data) {
     subtree = createTree(data);
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight);
+    renderer.setSize( window.innerHeight, window.innerHeight);
     document.body.appendChild( renderer.domElement );
 
     scene = new THREE.Scene();
@@ -28,7 +47,7 @@ function init (data) {
 
     raycaster = new THREE.Raycaster();
 
-    camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 10, 10000 );
+    camera = new THREE.PerspectiveCamera( 100, window.innerHeight/window.innerHeight, 10, 10000 );
 
     //camera field of view
     fov = camera.fov;
@@ -68,6 +87,7 @@ function init (data) {
     window.addEventListener( 'mousedown', onMouseDown, false );
     window.addEventListener( 'resize', onResize, false );
     window.addEventListener( 'mousewheel', mouseWheel, false );
+    window.addEventListener( 'keypress', keyDownResolver, false);
 
     lastAccessedObject = subtree.root.sceneObject;
 
@@ -75,6 +95,28 @@ function init (data) {
 	//window.addEventListener( 'DOMMouseScroll', mousewheel, false );
 
     window.animate();
+
+}
+
+function keyDownResolver( event ){
+    event.preventDefault();
+
+    console.log(event.keyCode);
+
+    if(event.keyCode == 108){
+
+        getUserInput();
+    }
+
+    if(event.keyCode == 107){
+
+        drawParentGraph(subtree);
+    }
+
+    if(event.keyCode == 32){
+
+        console.log("Will do this later.. SPACE");
+    }
 
 }
 
@@ -87,7 +129,6 @@ Note:
  */
 function subtreeSelection(node){
     subtree = createSubtreeFromTree(subtree, node);
-    console.log("Hello");
 }
 
 /*
@@ -188,10 +229,8 @@ function onMouseDown ( event ) {
     if ( intersects.length > 0 ) {
         emptyScene(scene);
 
-        console.log(intersects.length);
-
         var targetedObject = intersects[0];
-        var targetedObjectNode = getSceneObjectNode(subtree.root, targetedObject.object);
+        var targetedObjectNode = getSceneObjectNodeById(subtree.root, targetedObject.object);
 
         subtreeSelection(targetedObjectNode);
         drawCylinderTree(scene, subtree);
@@ -229,7 +268,7 @@ Note:
  */
 function onMouseMove( event ){
     //I have literally no idea why this works with such constants
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.x = ( event.clientX / window.innerHeight ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 }
@@ -253,6 +292,39 @@ function getColorFormatX( color ){
     
     
 }
+
+/*
+
+ */
+function drawParentGraph( subtree ){
+
+    //where I am now
+    var root = subtree.root;
+    //get corresponding node in main tree
+    var treeNode = getTreeNodeByLatinName(tree.root, root);
+
+    //construct parent tree
+    subtreeSelection(treeNode.parent);
+    drawCylinderTree(scene, subtree);
+    //this HAS to be called after drawing
+    //else lastAccessedObject will refer to non-existing sceneObject re-written by drawing
+    lastAccessedObject = subtree.root.sceneObject;
+}
+
+
+/*
+Description:
+    Creates a prompt window for user.
+    Enables user to select number of levels to be displayed.
+ */
+function getUserInput() {
+    var levels = prompt("Please select number of levels to display", "4");
+
+    levelsToDisplay = parseInt(levels, 10);
+
+    console.log(levelsToDisplay);
+}
+
 
 /*
 Description:
@@ -279,10 +351,10 @@ function update() {
         //var actualColor =
         targetedObject.object.material.color.setHex(0x000000);
 
-        var targetedObjectNode = getSceneObjectNode(subtree.root, targetedObject.object);
+        var targetedObjectNode = getSceneObjectNodeById(subtree.root, targetedObject.object);
         document.getElementById("latinWindow").innerHTML = targetedObjectNode.latin;
         //get node of blacked out object
-        var lastAccessedObjectNode = getSceneObjectNode(subtree.root, lastAccessedObject);
+        var lastAccessedObjectNode = getSceneObjectNodeById(subtree.root, lastAccessedObject);
 
         //create new color by force - #000000 format to 0x000000 format
         var colors = lastAccessedObjectNode.color.split("#");
@@ -300,7 +372,7 @@ function update() {
     }
     //if you run down from a node, remove highlighting and innerHTML
     else{
-        var lastAccessedObjectNode = getSceneObjectNode(subtree.root, lastAccessedObject);
+        var lastAccessedObjectNode = getSceneObjectNodeById(subtree.root, lastAccessedObject);
         var colors = lastAccessedObjectNode.color.split("#");
         var color = ("0x" + colors[1]);
         if (lastAccessedObjectNode != null) {
