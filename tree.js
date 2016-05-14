@@ -269,15 +269,15 @@ Description:
 Note:
     Passing subtree inside because of incorrect programming earlier, creating a dummy tree requires parsing whole XML.
  */
-function createSubtreeFromTree(subtree, node){
+function createSubtreeFromTree(clonedTree, node){
 
     var newRootNode = jQuery.extend(true, {}, node);
-    var newSubtree = jQuery.extend(true, {}, subtree);
+    var newSubtree = jQuery.extend(true, {}, clonedTree);
     
     newSubtree.root = newRootNode;
     assignTreeGraphicParameters(newSubtree);
     
-    return newSubtree;
+    subtree =  newSubtree;
 }
 
 /*

@@ -128,7 +128,7 @@ Note:
     Selecting root of actual visualization will do nothing.
  */
 function subtreeSelection(node){
-    subtree = createSubtreeFromTree(subtree, node);
+    createSubtreeFromTree(subtree, node);
 }
 
 /*
@@ -294,21 +294,33 @@ function getColorFormatX( color ){
 }
 
 /*
+Description:
+    Draws a sunburst from parent of actual root.
 
+Note:
+    TODO: Does nothing on global root graph.
  */
-function drawParentGraph( subtree ){
+function drawParentGraph( originalSubtree ){
 
     //where I am now
-    var root = subtree.root;
+    var originalRoot = originalSubtree.root;
     //get corresponding node in main tree
-    var treeNode = getTreeNodeByLatinName(tree.root, root);
+    if(originalRoot.latin != tree.root.latin) {
+        var treeNode = getTreeNodeByLatinName(tree.root, originalRoot);
 
-    //construct parent tree
-    subtreeSelection(treeNode.parent);
-    drawCylinderTree(scene, subtree);
-    //this HAS to be called after drawing
-    //else lastAccessedObject will refer to non-existing sceneObject re-written by drawing
-    lastAccessedObject = subtree.root.sceneObject;
+        //construct parent tree
+        subtreeSelection(treeNode.parent);
+        //clear the original graph
+        emptyScene(scene);
+        //draw parent graph
+        drawCylinderTree(scene, subtree);
+        //this HAS to be called after drawing
+        //else lastAccessedObject will refer to non-existing sceneObject re-written by drawing
+        lastAccessedObject = subtree.root.sceneObject;
+    }
+    else{
+        alert("Already on the top of graph");
+    }
 }
 
 
@@ -387,6 +399,8 @@ Description:
     Zooming camera on catching mouse wheel event.
  */
 function mouseWheel( event ) {
+    event.preventDefault();
+
     var d = ((typeof event.wheelDelta != "undefined")?(-event.wheelDelta):event.detail);
     d = 100 * ((d>0)?1:-1);
 
