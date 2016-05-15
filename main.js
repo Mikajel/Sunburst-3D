@@ -48,7 +48,7 @@ function init (data) {
 
     //set initial display depth to 2
     levelsToDisplay = 2;
-    document.getElementById("displayedLevels").innerHTML = "Displayed levels: " + levelsToDisplay ;
+    document.getElementById("displayedLevels").innerHTML = levelsToDisplay ;
 
     raycaster = new THREE.Raycaster();
 
@@ -106,8 +106,6 @@ function init (data) {
 function keyDownResolver( event ){
     event.preventDefault();
 
-    console.log(event.keyCode);
-
     if(event.keyCode == 108){
 
         getUserInput();
@@ -120,8 +118,7 @@ function keyDownResolver( event ){
         //else lastAccessedObject will refer to non-existing sceneObject re-written by drawing
         lastAccessedObject = subtree.root.sceneObject;
 
-        document.getElementById("displayedLevels").innerHTML = "Displayed levels: " + levelsToDisplay ;
-
+        document.getElementById("displayedLevels").innerHTML = levelsToDisplay ;
     }
 
     if(event.keyCode == 107){
@@ -131,9 +128,15 @@ function keyDownResolver( event ){
 
     if(event.keyCode == 32){
 
-        console.log("Will do this later.. SPACE");
+        var topNode = getTreeNodeByLatinName(tree.root, tree.root);
+        emptyScene(scene);
+        //redraw the scene with desired number of levels
+        subtreeSelection(topNode);
+        drawCylinderTree(scene, subtree);
+        //this HAS to be called after drawing
+        //else lastAccessedObject will refer to non-existing sceneObject re-written by drawing
+        lastAccessedObject = subtree.root.sceneObject;
     }
-
 }
 
 /*
@@ -142,6 +145,7 @@ Description:
 
 Note:
     Selecting root of actual visualization will do nothing.
+    Function itself will not change the visualization. Scene has to be emptied and redrawn.
  */
 function subtreeSelection(node){
         createSubtreeFromTree(subtree, node);
@@ -174,7 +178,7 @@ function drawCylinderTree(scene, subtree){
     drawCylinderNode(scene, subtree.depth, subtree.leafNumber, subtree.root);
     
     //set the label for actual root
-    document.getElementById("actualRoot").innerHTML = "Actual branch: " + subtree.root.latin;
+    document.getElementById("actualRoot").innerHTML = subtree.root.latin;
 }
 
 /*
@@ -308,22 +312,18 @@ function render() {
 
 /*
 Description:
-    Converts #ffffff format to 0xffffff format.
-    Returns 0xffffff format variable.
-    TODO: whole thing
+    Sets color of a node to highlighted gradiently.
  */
-function getColorFormatX( color ){
+function setColorHighlight( color ){
     
-    
-    
+    if(color.r > 0.5) color.r = (color.r * 1.005);
+    if(color.g > 0.5) color.g = (color.g * 1.005);
+    if(color.b > 0.5) color.b = (color.b * 1.005);
 }
 
 /*
 Description:
     Draws a sunburst from parent of actual root.
-
-Note:
-    TODO: Does nothing on global root graph.
  */
 function drawParentGraph( originalSubtree ){
 
@@ -370,7 +370,6 @@ Description:
 Note:
     Works on ray casting principle.
     Catches all objects into an array, highlights only nearest one.
-    TODO: Now only blacks out, finish in highlighting manner. Use proportional highlighting.
  */
 function update() {
 
@@ -384,9 +383,8 @@ function update() {
         var targetedObject = intersects[0];
 
         //color out targeted node
-        //TODO: get correct hexadecimal format.
-        //var actualColor =
-        targetedObject.object.material.color.setHex(0x000000);
+        setColorHighlight(targetedObject.object.material.color);
+
 
         var targetedObjectNode = getSceneObjectNodeById(subtree.root, targetedObject.object);
         document.getElementById("latinWindow").innerHTML = targetedObjectNode.latin;
@@ -415,6 +413,7 @@ function update() {
         if (lastAccessedObjectNode != null) {
             lastAccessedObjectNode.sceneObject.material.color.setHex(color);
         }
+        //clear the display of latin name
         document.getElementById("latinWindow").innerHTML = "";
     }
 }
